@@ -3,7 +3,8 @@ from torch.utils.data.dataset import random_split
 from torch.utils.data import DataLoader, Dataset, TensorDataset
 import numpy as np
 import re
-####################  Pre-process data   #######################
+
+####################  Utils for pre-process data   #######################
 
 def create_binary_vector(item_list, item_dict):
     v = np.zeros(len(item_dict), dtype='int32')
