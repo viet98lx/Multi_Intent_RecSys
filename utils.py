@@ -1,6 +1,7 @@
-
 import scipy.sparse as sp
+import numpy as np
 import os, re
+import itertools
 
 ################## build knowledge about data ###################
 
@@ -109,7 +110,6 @@ def create_sparse_matrix(pairs, NB_ITEMS):
     row = [p[0] for p in pairs]
     col = [p[1] for p in pairs]
     data = [pairs[p] for p in pairs]
-
     adj_matrix = sp.csc_matrix((data, (row, col)), shape=(NB_ITEMS, NB_ITEMS), dtype="float32")
     nb_nonzero = len(pairs)
     density = nb_nonzero * 1.0 / NB_ITEMS / NB_ITEMS
@@ -129,9 +129,7 @@ def normalize_adj(adj_matrix):
     d_inv_sqrt = np.power(row_sum, -0.5).flatten()
     d_inv_sqrt[np.isinf(d_inv_sqrt)] = 0.
     d_mat_inv_sqrt = sp.diags(d_inv_sqrt)
-
     normalized_matrix = adj_matrix.dot(d_mat_inv_sqrt).transpose().dot(d_mat_inv_sqrt)
-
     return normalized_matrix.tocsr()
 
 def remove_diag(adj_matrix):
@@ -139,3 +137,8 @@ def remove_diag(adj_matrix):
     new_adj_matrix.setdiag(0.0)
     new_adj_matrix.eliminate_zeros()
     return new_adj_matrix
+
+def read_instances_lines_from_file(file_path):
+    with open(file_path, "r") as f:
+        lines = [line.rstrip('\n') for line in f]
+        return lines
