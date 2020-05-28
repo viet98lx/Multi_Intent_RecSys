@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+from torch.nn import TransformerEncoder, TransformerEncoderLayer
 
 ###################  Multi Intent Next Basket Rec Model ####################
 
@@ -91,14 +93,16 @@ class RecSysModel(torch.nn.Module):
 
         item_bias_diag = torch.diag(F.relu(self.I_B))
         x = x.contiguous()
-        x = x.view(-1, self.nb_items)
-        encoder_x = torch.mm(x, item_bias_diag) + F.relu(torch.mm(x, self.A) - torch.abs(self.threshold))
+        # x = x.view(-1, self.nb_items)
+        # encoder_x = torch.mm(x, item_bias_diag) + F.relu(torch.mm(x, self.A) - torch.abs(self.threshold))
 
         # encoder_x = encoder_x.view(-1, self.max_seq_length, self.nb_items)
         basket_encoder_1 = self.drop_out1(F.relu(self.fc_basket_encoder(x)))
         basket_encoder_2 = self.drop_out2(F.relu(self.fc_basket_encoder_2(x)))
         combine = torch.cat((basket_encoder_1.unsqueeze(dim=-1), basket_encoder_2.unsqueeze(dim=-1)), dim=-1)
         basket_encoder = torch.max(combine, dim=-1).values
+        # print(basket_encoder.shape)
+        # print(seq_len)
         # print("similar between basket encoder sequence")
         # print_similar_list(similar_in_batch(basket_encoder.detach()))
 
@@ -108,6 +112,7 @@ class RecSysModel(torch.nn.Module):
         # pack seq for rnn
         packed_u_seqs = torch.nn.utils.rnn.pack_padded_sequence(basket_encoder, seq_len, batch_first=True,
                                                                 enforce_sorted=False)
+        # print(packed_u_seqs)
         (h_0, c_0) = self.init_hidden(batch_size)
 
         # next basket sequence encoder

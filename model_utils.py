@@ -11,7 +11,6 @@ def train_model(model, loss_func, optimizer, train_loader, epoch, top_k, train_d
         total_train_batch = nb_train_batch
     else:
         total_train_batch = nb_train_batch + 1
-    print('train')
     model.train()
     start = time.time()
 

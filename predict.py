@@ -37,7 +37,7 @@ def generate_predict(model, data_loader, result_file, reversed_item_dict, number
                     for col in range(0, indices.size()[1]):
                         f.write('| ' + str(reversed_item_dict[indices[row][col].item()]) + ': %.3f' % (values[row][col].item()) + ' ')
 
-def top_k_recall_on_all_dataset(model, data_loader, topK):
+def recall_for_data(model, data_loader, topK):
     device = model.device
     nb_batch = len(data_loader.dataset) // model.batch_size
     if len(data_loader.dataset) % model.batch_size == 0:
