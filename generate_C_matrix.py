@@ -1,6 +1,7 @@
 import argparse
 import utils
 import scipy.sparse as sp
+import os
 
 parser = argparse.ArgumentParser(description='Generate C matrix.')
 
@@ -10,6 +11,12 @@ args = parser.parse_args()
 
 data_dir = args.data_dir
 output_dir = data_dir + '/adj_matrix'
+if(not os.path.exists(output_dir)):
+  try:
+    os.makedirs(output_dir, exist_ok = True)
+    print("Directory '%s' created successfully" % output_dir)
+  except OSError as error:
+      print("OS folder error")
 nb_hop = args.nb_hop
 
 train_data_path = data_dir + 'train.txt'
