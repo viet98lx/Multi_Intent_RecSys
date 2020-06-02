@@ -3,6 +3,8 @@ import numpy as np
 import torch
 import os, re
 import itertools
+import matplotlib
+import matplotlib.pyplot as plt
 
 ################## utils and build knowledge about data ###################
 
@@ -174,3 +176,25 @@ def compute_recall_at_top_k(model, logits, top_k, target_basket, batch_size, dev
     # print(actual_basket_size)
 
     return torch.mean(nb_correct.type(logits.dtype) / actual_basket_size.type(logits.dtype)).item()
+
+def plot_loss(train_losses, val_losses):
+    with plt.style.context('seaborn-dark'):
+        # plt.figure(figsize=(4,3))
+        plt.plot(train_losses, label='Training')
+        plt.plot(val_losses, label='Validation')
+        # plt.plot(test_losses, label='Test')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.legend(frameon=False)
+        plt.show()
+
+def plot_recall(train_recalls, val_recalls):
+    with plt.style.context('seaborn-dark'):
+        # plt.figure(figsize=(4,3))
+        plt.plot(train_recalls, label='Training ')
+        plt.plot(val_recalls, label='Validation ')
+        # plt.plot(test_recalls, label='Test ')
+        plt.xlabel('Epoch')
+        plt.ylabel('Recall')
+        plt.legend(frameon=False)
+        plt.show()

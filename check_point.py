@@ -57,8 +57,14 @@ def load_ckpt(checkpoint_fpath, model, optimizer):
     optimizer.load_state_dict(checkpoint['optimizer'])
     # initialize valid_loss_min from checkpoint to valid_loss_min
     valid_loss_min = checkpoint['valid_loss_min']
+    # initialize best recall from checkpoint to best recall
+    best_recall = checkpoint['best_recall']
     # return model, optimizer, epoch value, min validation loss
-    return model, optimizer, checkpoint['epoch'], valid_loss_min
+    train_losses = checkpoint['train_loss_list']
+    train_recalls = checkpoint['train_recall_list']
+    val_losses = checkpoint['val_loss_list']
+    val_recalls = checkpoint['val_recall_list']
+    return model, optimizer, checkpoint['epoch'], valid_loss_min, best_recall, train_losses, train_recalls, val_losses, val_recalls
 
 
 def save_config_param(model_dir, prefix_name, config_param):

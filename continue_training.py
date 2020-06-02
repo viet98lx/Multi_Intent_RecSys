@@ -18,7 +18,6 @@ import loss
 parser = argparse.ArgumentParser(description='Continue training model')
 
 parser.add_argument('--ckpt_dir', type=str, help='folder contains check point', required=True)
-parser.add_argument('--cur_epoch', type=int, help='last epoch before interrupt', required=True)
 parser.add_argument('--epoch', type=int, help='number epoch to train', required=True)
 parser.add_argument('--model_name', type=str, help='name of model', required=True)
 parser.add_argument('--data_dir', type=str, help='folder contains data', required=True)
@@ -31,8 +30,6 @@ parser.add_argument('--device', type=str, help='device for train and predict', d
 
 args = parser.parse_args()
 
-
-cur_epoch = args.cur_epoch
 epoch = args.epoch
 model_name = args.model_name
 data_dir = args.data_dir
@@ -126,12 +123,12 @@ print('-------------------Continue Training Model---------------------')
 for ep in range(cur_epoch+1, epoch):
 
     rec_sys_model, optimizer, avg_train_loss, avg_train_recall = model_utils.train_model(rec_sys_model, loss_func, optimizer, train_loader,
-                                                                                         ep + 1, top_k, train_display_step)
+                                                                                         ep, top_k, train_display_step)
     train_losses.append(avg_train_loss)
     train_recalls.append(avg_train_recall)
 
     avg_val_loss, avg_val_recall = model_utils.validate_model(rec_sys_model, loss_func, valid_loader,
-                                                              ep + 1, top_k, val_display_step)
+                                                              ep, top_k, val_display_step)
     val_losses.append(avg_val_loss)
     val_recalls.append(avg_val_recall)
 
@@ -143,7 +140,7 @@ for ep in range(cur_epoch+1, epoch):
     # scheduler.step()
 
     checkpoint = {
-        'epoch': ep + 1,
+        'epoch': ep,
         'valid_loss_min': avg_val_loss,
         'best_recall': avg_val_recall,
         'state_dict': rec_sys_model.state_dict(),

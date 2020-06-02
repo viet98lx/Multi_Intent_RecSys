@@ -3,10 +3,11 @@ import torch
 
 class Weighted_BCE_Loss(torch.nn.Module):
 
-    def __init__(self):
+    def __init__(self, reduction ='mean'):
         super(Weighted_BCE_Loss, self).__init__()
+        self.reduction = reduction
 
-    def forward(self, predict, y, pos_weight=None, weight=None):
+    def forward(self, predict, y, pos_weight=None):
         sigmoid_predict = torch.sigmoid(predict)
         # sigmoid_predict = predict
         neg_y = (1.0 - y)
@@ -19,18 +20,21 @@ class Weighted_BCE_Loss(torch.nn.Module):
 
         nb_pos = (neg_y == 0).sum(dim=1).to(predict.dtype)
         nb_neg = (y.size()[1] - nb_pos).to(predict.dtype)
-        ratio = (nb_neg / (nb_pos + 1e-6)).unsqueeze(1)
 
         neg_loss = -neg_y * torch.log(1.0 - torch.sigmoid(predict - pos_min))
         pos_loss = -y * torch.log(sigmoid_predict)
 
-        loss_batch = pos_loss * ratio + neg_loss + 1e-8
+        # print("number pos size")
+        # print(nb_pos.size())
+        # print("number neg size")
+        # print(nb_neg.size())
 
-        if weight is not None:
-            weight.to(dtype=predict.dtype, device=predict.device)
-            loss_batch = loss_batch * weight
+        loss_batch = (pos_loss.sum(dim=-1)/nb_pos) + (neg_loss.sum(dim=-1)/nb_neg) + 1e-8
 
-        return loss_batch.mean()
+        if(self.reduction == 'mean'):
+            return loss_batch.mean()
+        else :
+            return loss_batch.sum()
 
 def predict_top_k(logits, top_k, batch_size, device, nb_items):
     predict_prob = torch.sigmoid(logits)
