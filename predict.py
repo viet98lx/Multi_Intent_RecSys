@@ -76,6 +76,7 @@ parser.add_argument('--epoch', type=int, help='last epoch before interrupt', req
 parser.add_argument('--data_dir', type=str, help='folder contains data', required=True)
 parser.add_argument('--nb_hop', type=int, help='top k predict', default=1)
 parser.add_argument('--batch_size', type=int, help='batch size predict', default=8)
+parser.add_argument('--nb_predict', type=int, help='number items predicted', default=10)
 parser.add_argument('--log_result_dir', type=str, help='folder to save result', required=True)
 
 args = parser.parse_args()
@@ -136,6 +137,6 @@ if(not os.path.exists(log_folder)):
   except OSError as error:
       print("OS folder error")
 
-nb_predict = 20
+nb_predict = args.nb_predict
 result_file = log_folder + '/' + prefix_model_ckpt + '_predict_top_' + str(nb_predict) + '.txt'
 generate_predict(load_model, test_loader, result_file, reversed_item_dict, nb_predict)
