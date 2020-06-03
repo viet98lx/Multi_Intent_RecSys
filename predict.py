@@ -75,6 +75,7 @@ parser.add_argument('--model_name', type=str, help='name of model', required=Tru
 parser.add_argument('--epoch', type=int, help='last epoch before interrupt', required=True)
 parser.add_argument('--data_dir', type=str, help='folder contains data', required=True)
 parser.add_argument('--nb_hop', type=int, help='top k predict', default=1)
+parser.add_argument('--batch_size', type=int, help='batch size predict', default=8)
 parser.add_argument('--log_result_dir', type=str, help='folder to save result', required=True)
 
 args = parser.parse_args()
@@ -116,9 +117,10 @@ print(" + Maximum sequence length: ", MAX_SEQ_LENGTH)
 print(" + Total items: ", NB_ITEMS)
 print('density of C matrix: %.6f' % (real_adj_matrix.nnz * 1.0 / NB_ITEMS / NB_ITEMS))
 
+batch_size = args.batch_size
 # train_loader = data_utils.generate_data_loader(train_instances, load_param['batch_size'], item_dict, MAX_SEQ_LENGTH, is_bseq=True, is_shuffle=True)
 # valid_loader = data_utils.generate_data_loader(validate_instances, load_param['batch_size'], item_dict, MAX_SEQ_LENGTH, is_bseq=True, is_shuffle=False)
-test_loader = data_utils.generate_data_loader(test_instances, load_param['batch_size'], item_dict, MAX_SEQ_LENGTH, is_bseq=True, is_shuffle=False)
+test_loader = data_utils.generate_data_loader(test_instances, batch_size, item_dict, MAX_SEQ_LENGTH, is_bseq=True, is_shuffle=True)
 
 pre_trained_model = model.RecSysModel(load_param, MAX_SEQ_LENGTH, item_probs, real_adj_matrix.todense(), device, model_data_type)
 pre_trained_model.to(device, dtype= model_data_type)
