@@ -14,7 +14,7 @@ def generate_predict(model, data_loader, result_file, reversed_item_dict, number
         total_batch = nb_test_batch
     else :
         total_batch = nb_test_batch + 1
-    print(total_batch)
+    print("Total Batch in data set %d" % total_batch)
     model.eval()
     with open(result_file, 'w') as f:
         f.write('Predict result: ')
