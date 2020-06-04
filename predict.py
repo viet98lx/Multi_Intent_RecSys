@@ -129,7 +129,7 @@ optimizer = torch.optim.RMSprop(pre_trained_model.parameters(), lr= 0.05)
 
 load_model, _, _, _, _, _, _, _, _ = check_point.load_ckpt(ckpt_path, pre_trained_model, optimizer)
 
-log_folder = os.path.join('log_result', prefix_model_ckpt)
+log_folder = os.path.join(args.log_result_dir, prefix_model_ckpt)
 if(not os.path.exists(log_folder)):
   try:
     os.makedirs(log_folder, exist_ok = True)
