@@ -92,5 +92,5 @@ def generate_data_loader(data_instances, b_size, item_dict, max_seq_len, is_bseq
     seq_len = torch.IntTensor(data_seq['L'])
 
     dataset = TensorDataset(sparse_X, seq_len, Y)
-    data_loader = DataLoader(dataset=dataset, batch_size= b_size, shuffle= is_shuffle, drop_last=True)
+    data_loader = DataLoader(dataset=dataset, batch_size= b_size, shuffle= is_shuffle)
     return data_loader

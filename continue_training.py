@@ -24,7 +24,8 @@ parser.add_argument('--data_dir', type=str, help='folder contains data', require
 parser.add_argument('--output_dir', type=str, help='folder to save model', required=True)
 parser.add_argument('--config_param_path', type=str, help='folder to save config param', required=True)
 parser.add_argument('--lr', type=float, help='learning rate of optimizer', default=0.01)
-# parser.add_argument('--top_k', type=int, help='top k predict', default=10)
+parser.add_argument('--top_k', type=int, help='top k predict', default=10)
+parser.add_argument('--cur_epoch', type=int, help='last epoch before interrupt', required=True)
 parser.add_argument('--epsilon', type=float, help='different between loss of two consecutive epoch ', default=0.00000001)
 parser.add_argument('--nb_hop', type=int, help='nb-hop', default=1)
 parser.add_argument('--device', type=str, help='device for train and predict', default='cpu')
@@ -39,6 +40,7 @@ ckpt_dir = args.ckpt_dir
 best_ckpt_dir = output_dir + '/best_model_checkpoint'
 nb_hop = args.nb_hop
 config_param_file = args.config_param_path
+cur_epoch = args.cur_epoch
 
 torch.manual_seed(1)
 np.random.seed(2)

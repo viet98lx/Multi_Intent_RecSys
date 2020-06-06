@@ -12,7 +12,6 @@ def train_model(model, loss_func, optimizer, train_loader, epoch, top_k, train_d
     else:
         total_train_batch = nb_train_batch + 1
     model.train()
-    hidden = model.init_hidden(model.batch_size)
     start = time.time()
 
     for i, data in enumerate(train_loader, 0):
@@ -20,6 +19,7 @@ def train_model(model, loss_func, optimizer, train_loader, epoch, top_k, train_d
         user_seq, train_seq_len, target_basket = data
         x_train_batch = user_seq.to_dense().to(dtype=model.d_type, device=device)
         real_batch_size = x_train_batch.size()[0]
+        hidden = model.init_hidden(real_batch_size)
         y_train = target_basket.to(device=device, dtype=model.d_type)
 
         optimizer.zero_grad()  # clear gradients for this training step
@@ -69,11 +69,12 @@ def validate_model(model, loss_func, valid_loader, epoch, top_k, val_display_ste
         total_val_batch = nb_val_batch + 1
 
     model.eval()
-    hidden = model.init_hidden(model.batch_size)
+
     for valid_i, valid_data in enumerate(valid_loader, 0):
         valid_in, valid_seq_len, valid_out = valid_data
         x_valid = valid_in.to_dense().to(dtype=model.d_type, device=device)
         val_batch_size = x_valid.size()[0]
+        hidden = model.init_hidden(val_batch_size)
         y_valid = valid_out.to(device=device, dtype=model.d_type)
 
         valid_predict = model(x_valid, valid_seq_len, hidden)
@@ -106,11 +107,12 @@ def test_model(model, loss_func, test_loader, epoch, top_k, test_display_step):
         total_test_batch = nb_test_batch + 1
 
     model.eval()
-    hidden = model.init_hidden(model.batch_size)
+
     for test_i, test_data in enumerate(test_loader, 0):
         test_in, test_seq_len, test_out = test_data
         x_test = test_in.to_dense().to(dtype=model.d_type, device=device)
         real_test_batch_size = x_test.size()[0]
+        hidden = model.init_hidden(real_test_batch_size)
         y_test = test_out.to(device=device, dtype=model.d_type)
 
         test_predict = model(x_test, test_seq_len, hidden)

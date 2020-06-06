@@ -112,7 +112,7 @@ for param in rec_sys_model.parameters():
   print(param.shape)
 
 loss_func = loss.Weighted_BCE_Loss()
-optimizer = torch.optim.RMSprop(rec_sys_model.parameters(), lr= args.lr, weight_decay= 5e-6)
+optimizer = torch.optim.RMSprop(rec_sys_model.parameters(), lr= args.lr)
 
 try:
     os.makedirs(output_dir, exist_ok = True)
