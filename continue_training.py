@@ -14,7 +14,7 @@ import model
 import model_utils
 import loss
 
-
+torch.set_printoptions(precision=8)
 parser = argparse.ArgumentParser(description='Continue training model')
 
 parser.add_argument('--ckpt_dir', type=str, help='folder contains check point', required=True)
@@ -24,8 +24,9 @@ parser.add_argument('--data_dir', type=str, help='folder contains data', require
 parser.add_argument('--output_dir', type=str, help='folder to save model', required=True)
 parser.add_argument('--config_param_path', type=str, help='folder to save config param', required=True)
 parser.add_argument('--lr', type=float, help='learning rate of optimizer', default=0.01)
-parser.add_argument('--epsilon', type=float, help='different between loss of two consecutive epoch ', default=0.000005)
-parser.add_argument('--nb_hop', type=int, help='top k predict', default=1)
+# parser.add_argument('--top_k', type=int, help='top k predict', default=10)
+parser.add_argument('--epsilon', type=float, help='different between loss of two consecutive epoch ', default=0.00000001)
+parser.add_argument('--nb_hop', type=int, help='nb-hop', default=1)
 parser.add_argument('--device', type=str, help='device for train and predict', default='cpu')
 
 args = parser.parse_args()
@@ -98,9 +99,9 @@ rec_sys_model, optimizer, cur_epoch, val_loss_min, best_recall, train_losses, tr
 loss_func = loss.Weighted_BCE_Loss()
 
 top_k = config_param['top_k']
-train_display_step = 100
-val_display_step = 20
-test_display_step = 4
+train_display_step = 300
+val_display_step = 60
+test_display_step = 10
 epoch = args.epoch
 
 loss_min = val_loss_min

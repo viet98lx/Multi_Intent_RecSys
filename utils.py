@@ -179,7 +179,7 @@ def compute_recall_at_top_k(model, logits, top_k, target_basket, batch_size, dev
 
 def plot_loss(train_losses, val_losses):
     with plt.style.context('seaborn-dark'):
-        # plt.figure(figsize=(4,3))
+        plt.figure(figsize=(4,3))
         plt.plot(train_losses, label='Training')
         plt.plot(val_losses, label='Validation')
         # plt.plot(test_losses, label='Test')
@@ -190,7 +190,7 @@ def plot_loss(train_losses, val_losses):
 
 def plot_recall(train_recalls, val_recalls):
     with plt.style.context('seaborn-dark'):
-        # plt.figure(figsize=(4,3))
+        plt.figure(figsize=(4,3))
         plt.plot(train_recalls, label='Training ')
         plt.plot(val_recalls, label='Validation ')
         # plt.plot(test_recalls, label='Test ')

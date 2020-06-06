@@ -14,7 +14,7 @@ import scipy.sparse as sp
 import random
 import os
 
-
+torch.set_printoptions(precision=8)
 parser = argparse.ArgumentParser(description='Train model')
 
 parser.add_argument('--batch_size', type=int, help='batch size of data set (default:32)', default=32)
@@ -57,7 +57,7 @@ nb_hop = args.nb_hop
 
 torch.manual_seed(1)
 np.random.seed(2)
-random.seed(0)
+random.seed(3)
 
 train_data_path = data_dir + 'train.txt'
 train_instances = utils.read_instances_lines_from_file(train_data_path)
@@ -126,9 +126,9 @@ model_name = args.model_name
 
 
 top_k = config_param['top_k']
-train_display_step = 100
-val_display_step = 20
-test_display_step = 4
+train_display_step = 300
+val_display_step = 60
+test_display_step = 10
 epoch = args.epoch
 
 loss_min = 1000

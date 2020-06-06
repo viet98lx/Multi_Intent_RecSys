@@ -12,6 +12,7 @@ def train_model(model, loss_func, optimizer, train_loader, epoch, top_k, train_d
     else:
         total_train_batch = nb_train_batch + 1
     model.train()
+    hidden = model.init_hidden(model.batch_size)
     start = time.time()
 
     for i, data in enumerate(train_loader, 0):
@@ -23,7 +24,7 @@ def train_model(model, loss_func, optimizer, train_loader, epoch, top_k, train_d
 
         optimizer.zero_grad()  # clear gradients for this training step
 
-        predict = model(x_train_batch, train_seq_len)  # predicted output
+        predict = model(x_train_batch, train_seq_len, hidden)  # predicted output
         loss = loss_func(predict, y_train)  # WBCE loss
         loss.backward()  # backpropagation, compute gradients
         optimizer.step()  # update gradient
@@ -68,13 +69,14 @@ def validate_model(model, loss_func, valid_loader, epoch, top_k, val_display_ste
         total_val_batch = nb_val_batch + 1
 
     model.eval()
+    hidden = model.init_hidden(model.batch_size)
     for valid_i, valid_data in enumerate(valid_loader, 0):
         valid_in, valid_seq_len, valid_out = valid_data
         x_valid = valid_in.to_dense().to(dtype=model.d_type, device=device)
         val_batch_size = x_valid.size()[0]
         y_valid = valid_out.to(device=device, dtype=model.d_type)
 
-        valid_predict = model(x_valid, valid_seq_len)
+        valid_predict = model(x_valid, valid_seq_len, hidden)
         val_loss = loss_func(valid_predict, y_valid)
 
         val_loss_item = val_loss.item()
@@ -104,13 +106,14 @@ def test_model(model, loss_func, test_loader, epoch, top_k, test_display_step):
         total_test_batch = nb_test_batch + 1
 
     model.eval()
+    hidden = model.init_hidden(model.batch_size)
     for test_i, test_data in enumerate(test_loader, 0):
         test_in, test_seq_len, test_out = test_data
         x_test = test_in.to_dense().to(dtype=model.d_type, device=device)
         real_test_batch_size = x_test.size()[0]
         y_test = test_out.to(device=device, dtype=model.d_type)
 
-        test_predict = model(x_test, test_seq_len)
+        test_predict = model(x_test, test_seq_len, hidden)
         test_loss = loss_func(test_predict, y_test)
 
         test_loss_item = test_loss.item()
