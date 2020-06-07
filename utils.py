@@ -5,7 +5,6 @@ import os, re
 import itertools
 import matplotlib
 import matplotlib.pyplot as plt
-%matplotlib inline
 
 
 ################## utils and build knowledge about data ###################
@@ -188,8 +187,9 @@ def plot_loss(train_losses, val_losses, images_dir):
         plt.xlabel('Epoch')
         plt.ylabel('Loss')
         plt.legend(frameon=False)
-        plt.show()
         plt.savefig(f"{images_dir}/losses.png")
+        plt.show()
+
 
 def plot_recall(train_recalls, val_recalls, images_dir):
     with plt.style.context('seaborn-dark'):
@@ -200,5 +200,5 @@ def plot_recall(train_recalls, val_recalls, images_dir):
         plt.xlabel('Epoch')
         plt.ylabel('Recall')
         plt.legend(frameon=False)
-        plt.show()
         plt.savefig(f"{images_dir}/recalls.png")
+        plt.show()

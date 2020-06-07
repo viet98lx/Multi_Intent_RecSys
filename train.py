@@ -13,9 +13,6 @@ import numpy as np
 import scipy.sparse as sp
 import random
 import os
-import matplotlib
-import matplotlib.pyplot as plt
-%matplotlib inline
 
 torch.set_printoptions(precision=8)
 parser = argparse.ArgumentParser(description='Train model')

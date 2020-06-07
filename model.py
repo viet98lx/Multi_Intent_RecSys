@@ -48,6 +48,7 @@ class RecSysModel(torch.nn.Module):
         # self.norm1d = nn.LayerNorm(self.embedding_dim)
         self.fc_basket_encoder_1 = nn.Linear(in_features=self.nb_items, out_features=self.embedding_dim, bias=True)
         self.fc_basket_encoder_2 = nn.Linear(in_features=self.nb_items, out_features=self.embedding_dim, bias=True)
+        self.fc_basket_encoder_3 = nn.Linear(in_features=2*self.embedding_dim, out_features=2*self.embedding_dim)
 
         # encoder_layers = TransformerEncoderLayer(d_model = self.embedding_dim, nhead = self.num_heads, dim_feedforward = self.embed_transformer, dropout= self.dropout)
         # self.transformer_encoder = TransformerEncoder(encoder_layers, self.n_layers)
@@ -62,13 +63,13 @@ class RecSysModel(torch.nn.Module):
 
     def init_weight(self):
         torch.nn.init.kaiming_uniform_(self.fc_basket_encoder_1.weight.data, nonlinearity='relu')
-        # self.fc_basket_encoder.weight.data.zero_()
         self.fc_basket_encoder_1.bias.data.zero_()
 
         torch.nn.init.kaiming_uniform_(self.fc_basket_encoder_2.weight.data, nonlinearity='relu')
-        # self.fc_basket_encoder_2.weight.data.zero_()
         self.fc_basket_encoder_2.bias.data.zero_()
         # print(self.fc_basket_encoder.weight.data)
+
+        torch.nn.init.kaiming_uniform_(self.fc_basket_encoder_3.weight.data, nonlinearity='relu')
 
         torch.nn.init.xavier_uniform_(self.h2item_score.weight.data)
         # self.h2item_score.bias.data.zero_()
@@ -96,9 +97,10 @@ class RecSysModel(torch.nn.Module):
         # basket_encoder = (basket_encoder_1 + basket_encoder_2)/2
         combine = torch.cat((basket_encoder_1, basket_encoder_2), dim=-1)
         # basket_encoder = torch.max(combine, dim=-1).values
+        basket_encoder = F.relu(self.fc_basket_encoder_3(combine))
 
         # next basket sequence encoder
-        lstm_out, (h_n, c_n) = self.seq_encoder(combine, hidden)
+        lstm_out, (h_n, c_n) = self.seq_encoder(basket_encoder, hidden)
         # print(lstm_out)
         actual_index = torch.arange(0, batch_size) * self.max_seq_length + (seq_len - 1)
         actual_lstm_out = lstm_out.reshape(-1, self.rnn_units)[actual_index]

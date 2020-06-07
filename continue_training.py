@@ -7,7 +7,6 @@ import os
 
 import matplotlib
 import matplotlib.pyplot as plt
-%matplotlib inline
 
 
 import utils
