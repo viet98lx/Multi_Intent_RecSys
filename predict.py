@@ -40,7 +40,7 @@ def generate_predict(model, data_loader, result_file, reversed_item_dict, number
                 f.write('\n')
                 f.write('predicted items: ')
                 for col in range(0, indices.size()[1]):
-                    f.write('| ' + str(reversed_item_dict[indices[row][col].item()]) + ': %.3f' % (values[row][col].item()) + ' ')
+                    f.write('| ' + str(reversed_item_dict[indices[row][col].item()]) + ': %.8f' % (values[row][col].item()) + ' ')
 
 def recall_for_data(model, data_loader, topK, batch_size):
     device = model.device
