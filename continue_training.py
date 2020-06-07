@@ -4,7 +4,10 @@ import torch
 import numpy as np
 import scipy.sparse as sp
 import os
+
+import matplotlib
 import matplotlib.pyplot as plt
+%matplotlib inline
 
 
 import utils
@@ -27,7 +30,7 @@ parser.add_argument('--lr', type=float, help='learning rate of optimizer', defau
 parser.add_argument('--top_k', type=int, help='top k predict', default=10)
 parser.add_argument('--cur_epoch', type=int, help='last epoch before interrupt', required=True)
 parser.add_argument('--epsilon', type=float, help='different between loss of two consecutive epoch ', default=0.00000001)
-parser.add_argument('--nb_hop', type=int, help='nb-hop', default=1)
+parser.add_argument('--nb_hop', type=int, help='level of correlation matrix', default=1)
 parser.add_argument('--device', type=str, help='device for train and predict', default='cpu')
 
 args = parser.parse_args()
@@ -166,5 +169,6 @@ for ep in range(cur_epoch+1, epoch):
         recall_max = avg_val_recall
 
     print('-' * 100)
-    utils.plot_loss(train_losses, val_losses)
-    utils.plot_recall(train_recalls, val_recalls)
+    ckpt_path = ckpt_dir + model_name + '/epoch_' + str(ep) + '/'
+    utils.plot_loss(train_losses, val_losses, ckpt_path)
+    utils.plot_recall(train_recalls, val_recalls, ckpt_path)

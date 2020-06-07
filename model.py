@@ -89,7 +89,7 @@ class RecSysModel(torch.nn.Module):
         reshape_x = x.reshape(-1, self.nb_items)
         encode_x_graph = torch.mm(reshape_x, item_bias_diag) + F.relu(torch.mm(reshape_x, self.A) - torch.abs(self.threshold))
         basket_x = encode_x_graph.reshape(-1, self.max_seq_length, self.nb_items)
-        basket_encoder_1 = F.relu(self.fc_basket_encoder(basket_x))
+        basket_encoder_1 = F.relu(self.fc_basket_encoder_1(basket_x))
         # print(basket_encoder_1)
         basket_encoder_2 = F.relu(self.fc_basket_encoder_2(basket_x))
 

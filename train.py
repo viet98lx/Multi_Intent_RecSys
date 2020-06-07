@@ -13,6 +13,9 @@ import numpy as np
 import scipy.sparse as sp
 import random
 import os
+import matplotlib
+import matplotlib.pyplot as plt
+%matplotlib inline
 
 torch.set_printoptions(precision=8)
 parser = argparse.ArgumentParser(description='Train model')
@@ -21,7 +24,7 @@ parser.add_argument('--batch_size', type=int, help='batch size of data set (defa
 parser.add_argument('--rnn_units', type=int, help='number units of hidden size lstm', default=16)
 parser.add_argument('--rnn_layers', type=int, help='number layers of RNN', default=1)
 parser.add_argument('--alpha', type=float, help='coefficient of C matrix in predict item score', default=0.4)
-parser.add_argument('--lr', type=float, help='learning rate of optimizer', default=0.05)
+parser.add_argument('--lr', type=float, help='learning rate of optimizer', default=0.01)
 parser.add_argument('--dropout', type=float, help='drop out after linear model', default= 0.3)
 parser.add_argument('--embed_dim', type=int, help='dimension of linear layers', default=8)
 parser.add_argument('--embed_dim_transformer', type=int, help='dimension of transformer project layers', default=8)
@@ -29,9 +32,9 @@ parser.add_argument('--transformer_layers', type=int, help='number transformer l
 parser.add_argument('--transformer_head', type=int, help='number heads of transformer layers', default=2)
 parser.add_argument('--device', type=str, help='device for train and predict', default='cpu')
 parser.add_argument('--top_k', type=int, help='top k predict', default=10)
-parser.add_argument('--nb_hop', type=int, help='top k predict', default=1)
-parser.add_argument('--epoch', type=int, help='epoch to train', default=50)
-parser.add_argument('--epsilon', type=float, help='different between loss of two consecutive epoch ', default=0.000005)
+parser.add_argument('--nb_hop', type=int, help='level of correlation matrix', default=1)
+parser.add_argument('--epoch', type=int, help='epoch to train', default=30)
+parser.add_argument('--epsilon', type=float, help='different between loss of two consecutive epoch ', default=0.00000001)
 parser.add_argument('--model_name', type=str, help='name of model', required=True)
 parser.add_argument('--data_dir', type=str, help='folder contains data', required=True)
 parser.add_argument('--output_dir', type=str, help='folder to save model', required=True)
@@ -191,5 +194,6 @@ for ep in range(epoch):
         recall_max = avg_val_recall
 
     print('-' * 100)
-    utils.plot_loss(train_losses, val_losses)
-    utils.plot_recall(train_recalls, val_recalls)
+    ckpt_path = checkpoint_dir+model_name+'/epoch_'+str(ep)+'/'
+    utils.plot_loss(train_losses, val_losses, ckpt_path)
+    utils.plot_recall(train_recalls, val_recalls, ckpt_path)

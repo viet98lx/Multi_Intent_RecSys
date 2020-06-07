@@ -54,11 +54,11 @@ def recall_for_data(model, data_loader, topK, batch_size):
     list_actual_size = []
 
     model.eval()
-    hidden = model.init_hidden(batch_size)
     for idx, data_pack in enumerate(data_loader,0):
         x_, data_seq_len, y_ = data_pack
         x_test = x_.to_dense().to(dtype = model.d_type, device = device)
         real_batch_size = x_test.size()[0]
+        hidden = model.init_hidden(real_batch_size)
         y_test = y_.to(device = device, dtype = model.d_type)
 
         logits_predict = model(x_test, data_seq_len, hidden)
@@ -76,7 +76,7 @@ parser.add_argument('--ckpt_dir', type=str, help='folder contains check point', 
 parser.add_argument('--model_name', type=str, help='name of model', required=True)
 parser.add_argument('--epoch', type=int, help='last epoch before interrupt', required=True)
 parser.add_argument('--data_dir', type=str, help='folder contains data', required=True)
-parser.add_argument('--nb_hop', type=int, help='top k predict', default=1)
+parser.add_argument('--nb_hop', type=int, help='level of correlation matrix', default=1)
 parser.add_argument('--batch_size', type=int, help='batch size predict', default=8)
 parser.add_argument('--nb_predict', type=int, help='number items predicted', default=10)
 parser.add_argument('--log_result_dir', type=str, help='folder to save result', required=True)

@@ -5,6 +5,8 @@ import os, re
 import itertools
 import matplotlib
 import matplotlib.pyplot as plt
+%matplotlib inline
+
 
 ################## utils and build knowledge about data ###################
 
@@ -177,7 +179,7 @@ def compute_recall_at_top_k(model, logits, top_k, target_basket, batch_size, dev
 
     return torch.mean(nb_correct.type(logits.dtype) / actual_basket_size.type(logits.dtype)).item()
 
-def plot_loss(train_losses, val_losses):
+def plot_loss(train_losses, val_losses, images_dir):
     with plt.style.context('seaborn-dark'):
         plt.figure(figsize=(4,3))
         plt.plot(train_losses, label='Training')
@@ -187,8 +189,9 @@ def plot_loss(train_losses, val_losses):
         plt.ylabel('Loss')
         plt.legend(frameon=False)
         plt.show()
+        plt.savefig(f"{images_dir}/losses.png")
 
-def plot_recall(train_recalls, val_recalls):
+def plot_recall(train_recalls, val_recalls, images_dir):
     with plt.style.context('seaborn-dark'):
         plt.figure(figsize=(4,3))
         plt.plot(train_recalls, label='Training ')
@@ -198,3 +201,4 @@ def plot_recall(train_recalls, val_recalls):
         plt.ylabel('Recall')
         plt.legend(frameon=False)
         plt.show()
+        plt.savefig(f"{images_dir}/recalls.png")
