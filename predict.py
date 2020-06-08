@@ -16,13 +16,13 @@ def generate_predict(model, data_loader, result_file, reversed_item_dict, number
         total_batch = nb_test_batch + 1
     print("Total Batch in data set %d" % total_batch)
     model.eval()
-    hidden = model.init_hidden(batch_size)
     with open(result_file, 'w') as f:
         f.write('Predict result: ')
         for i, data_pack in enumerate(data_loader,0):
             data_x, data_seq_len, data_y = data_pack
             x_ = data_x.to_dense().to(dtype = model.d_type, device = device)
             real_batch_size = x_.size()[0]
+            hidden = model.init_hidden(real_batch_size)
             y_ = data_y.to(dtype = model.d_type, device = device)
             predict_ = model(x_, data_seq_len, hidden)
             sigmoid_pred = torch.sigmoid(predict_)
