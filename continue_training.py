@@ -123,7 +123,7 @@ print('-------------------Continue Training Model---------------------')
 
 ############################ Train Model #############################
 
-# scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=4, gamma=0.5)
+# scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)
 
 for ep in range(cur_epoch+1, epoch):
 

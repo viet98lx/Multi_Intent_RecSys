@@ -30,10 +30,13 @@ with open(result_file, 'r') as f:
 list_recall = []
 # print("list seq:")
 # print(list_seq)
+# print(len(list_seq))
 # print("list predicted items")
 # print(list_seq_topk_predicted)
+# print(len(list_seq_topk_predicted))
 for i, ground_truth in enumerate(list_seq):
   correct = 0
+  # print(i)
   for item in list_seq_topk_predicted[i]:
     if (item in ground_truth):
         correct += 1

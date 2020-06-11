@@ -21,8 +21,8 @@ parser.add_argument('--batch_size', type=int, help='batch size of data set (defa
 parser.add_argument('--rnn_units', type=int, help='number units of hidden size lstm', default=16)
 parser.add_argument('--rnn_layers', type=int, help='number layers of RNN', default=1)
 parser.add_argument('--alpha', type=float, help='coefficient of C matrix in predict item score', default=0.4)
-parser.add_argument('--lr', type=float, help='learning rate of optimizer', default=0.01)
-parser.add_argument('--dropout', type=float, help='drop out after linear model', default= 0.3)
+parser.add_argument('--lr', type=float, help='learning rate of optimizer', default=0.001)
+parser.add_argument('--dropout', type=float, help='drop out after linear model', default= 0.2)
 parser.add_argument('--embed_dim', type=int, help='dimension of linear layers', default=8)
 parser.add_argument('--embed_dim_transformer', type=int, help='dimension of transformer project layers', default=8)
 parser.add_argument('--transformer_layers', type=int, help='number transformer layers', default=1)
@@ -146,7 +146,7 @@ print('-------------------Start Training Model---------------------')
 
 ############################ Train Model #############################
 
-# scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=4, gamma=0.5)
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.8)
 
 for ep in range(epoch):
 
@@ -160,12 +160,12 @@ for ep in range(epoch):
     val_losses.append(avg_val_loss)
     val_recalls.append(avg_val_recall)
 
-    # avg_test_loss, avg_test_recall = model_utils.test_model(rec_sys_model, loss_func, test_loader,
-    #                                                         ep, top_k, test_display_step)
-    # test_losses.append(avg_test_loss)
-    # test_recalls.append(avg_test_recall)
+    avg_test_loss, avg_test_recall = model_utils.test_model(rec_sys_model, loss_func, test_loader,
+                                                            ep, top_k, test_display_step)
+    test_losses.append(avg_test_loss)
+    test_recalls.append(avg_test_recall)
 
-    # scheduler.step()
+    scheduler.step()
 
     checkpoint = {
         'epoch': ep,
@@ -173,6 +173,7 @@ for ep in range(epoch):
         'best_recall': avg_val_recall,
         'state_dict': rec_sys_model.state_dict(),
         'optimizer': optimizer.state_dict(),
+        # 'schedule': scheduler.state_dict(),
         'val_loss_list': val_losses,
         'val_recall_list': val_recalls,
         'train_loss_list': train_losses,
@@ -182,13 +183,14 @@ for ep in range(epoch):
     check_point.save_ckpt(checkpoint, False, model_name, checkpoint_dir, best_model_dir, ep)
     check_point.save_config_param(checkpoint_dir, model_name, config_param)
 
-    if ((loss_min - avg_val_loss) / loss_min > epsilon and avg_val_recall > recall_max):
-        print('Test loss decrease from ({:.5f} --> {:.5f}) '.format(loss_min, avg_val_loss))
+    if ((loss_min - avg_test_loss) / loss_min > epsilon and avg_test_recall > recall_max):
+        print('Test loss decrease from ({:.6f} --> {:.6f}) '.format(loss_min, avg_test_loss))
+        print('recall increase from {:.6f} --> {:.6f}'.format(recall_max, avg_test_recall))
         print('Can save model')
         check_point.save_ckpt(checkpoint, True, model_name, checkpoint_dir, best_model_dir, ep)
         check_point.save_config_param(best_model_dir, model_name, config_param)
-        loss_min = avg_val_loss
-        recall_max = avg_val_recall
+        loss_min = avg_test_loss
+        recall_max = avg_test_recall
 
     print('-' * 100)
     ckpt_path = checkpoint_dir+model_name+'/epoch_'+str(ep)+'/'

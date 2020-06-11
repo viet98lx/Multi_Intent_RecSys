@@ -43,18 +43,18 @@ class RecSysModel(torch.nn.Module):
         self.mask = None
 
         # network architecture
-        # self.drop_out_1 = nn.Dropout(p=self.dropout)
+        self.drop_out_1 = nn.Dropout(p=self.dropout)
         # self.drop_out_2 = nn.Dropout(p=self.dropout)
         # self.norm1d = nn.LayerNorm(self.embedding_dim)
         self.fc_basket_encoder_1 = nn.Linear(in_features=self.nb_items, out_features=self.embedding_dim, bias=True)
-        self.fc_basket_encoder_2 = nn.Linear(in_features=self.nb_items, out_features=self.embedding_dim, bias=True)
-        self.fc_basket_encoder_3 = nn.Linear(in_features=2*self.embedding_dim, out_features=2*self.embedding_dim)
+        # self.fc_basket_encoder_2 = nn.Linear(in_features=self.nb_items, out_features=self.embedding_dim, bias=True)
+        # self.fc_basket_encoder_3 = nn.Linear(in_features=2*self.embedding_dim, out_features=2*self.embedding_dim)
 
-        # encoder_layers = TransformerEncoderLayer(d_model = self.embedding_dim, nhead = self.num_heads, dim_feedforward = self.embed_transformer, dropout= self.dropout)
-        # self.transformer_encoder = TransformerEncoder(encoder_layers, self.n_layers)
+        encoder_layers = TransformerEncoderLayer(d_model = self.embedding_dim, nhead = self.num_heads, dim_feedforward = self.embed_transformer, dropout= self.dropout)
+        self.transformer_encoder = TransformerEncoder(encoder_layers, self.n_layers)
         # self.layer_norm = nn.LayerNorm([self.max_seq_length, self.embedding_dim])
         # self.src_mask = None
-        self.seq_encoder = nn.LSTM(2*self.embedding_dim, self.rnn_units, self.rnn_layers, bias=True, batch_first=True)
+        self.seq_encoder = nn.LSTM(self.embedding_dim, self.rnn_units, self.rnn_layers, bias=True, batch_first=True)
         # self.W_hidden = nn.Parameter(data=torch.randn(self.rnn_units, self.nb_items).type(self.d_type))
         self.h2item_score = nn.Linear(in_features=self.rnn_units, out_features=self.nb_items, bias=False)
         self.threshold = nn.Parameter(data=torch.Tensor([threshold]).type(d_type))
@@ -65,11 +65,11 @@ class RecSysModel(torch.nn.Module):
         torch.nn.init.kaiming_uniform_(self.fc_basket_encoder_1.weight.data, nonlinearity='relu')
         self.fc_basket_encoder_1.bias.data.zero_()
 
-        torch.nn.init.kaiming_uniform_(self.fc_basket_encoder_2.weight.data, nonlinearity='relu')
-        self.fc_basket_encoder_2.bias.data.zero_()
+        # torch.nn.init.kaiming_uniform_(self.fc_basket_encoder_2.weight.data, nonlinearity='relu')
+        # self.fc_basket_encoder_2.bias.data.zero_()
         # print(self.fc_basket_encoder.weight.data)
 
-        torch.nn.init.kaiming_uniform_(self.fc_basket_encoder_3.weight.data, nonlinearity='relu')
+        # torch.nn.init.kaiming_uniform_(self.fc_basket_encoder_3.weight.data, nonlinearity='relu')
 
         torch.nn.init.xavier_uniform_(self.h2item_score.weight.data)
         # self.h2item_score.bias.data.zero_()
@@ -90,17 +90,19 @@ class RecSysModel(torch.nn.Module):
         reshape_x = x.reshape(-1, self.nb_items)
         encode_x_graph = torch.mm(reshape_x, item_bias_diag) + F.relu(torch.mm(reshape_x, self.A) - torch.abs(self.threshold))
         basket_x = encode_x_graph.reshape(-1, self.max_seq_length, self.nb_items)
-        basket_encoder_1 = F.relu(self.fc_basket_encoder_1(basket_x))
+        basket_encoder_1 = self.drop_out_1(F.relu(self.fc_basket_encoder_1(basket_x)))
         # print(basket_encoder_1)
-        basket_encoder_2 = F.relu(self.fc_basket_encoder_2(basket_x))
+        # basket_encoder_2 = F.relu(self.fc_basket_encoder_2(basket_x))
 
         # basket_encoder = (basket_encoder_1 + basket_encoder_2)/2
-        combine = torch.cat((basket_encoder_1, basket_encoder_2), dim=-1)
+        # combine = torch.cat((basket_encoder_1, basket_encoder_2), dim=-1)
         # basket_encoder = torch.max(combine, dim=-1).values
-        basket_encoder = F.relu(self.fc_basket_encoder_3(combine))
+        # basket_encoder = F.relu(self.fc_basket_encoder_3(combine))
+        transformer_encoder = self.transformer_encoder(basket_encoder_1.transpose(0, 1),
+                                                       src_key_padding_mask=self.create_src_key_padding_mask(seq_len))
 
         # next basket sequence encoder
-        lstm_out, (h_n, c_n) = self.seq_encoder(basket_encoder, hidden)
+        lstm_out, (h_n, c_n) = self.seq_encoder(transformer_encoder.transpose(0,1), hidden)
         # print(lstm_out)
         actual_index = torch.arange(0, batch_size) * self.max_seq_length + (seq_len - 1)
         actual_lstm_out = lstm_out.reshape(-1, self.rnn_units)[actual_index]
