@@ -32,8 +32,8 @@ class RecSysModel(torch.nn.Module):
         self.d_type = d_type
 
         # initialized adjacency matrix
-        self.A = adj_matrix
-        self.A = torch.from_numpy(self.A).to(self.device, d_type)
+        self.C = adj_matrix
+        self.C = torch.from_numpy(self.C).to(self.device, d_type)
 
         # threshold ignore weak correlation
         threshold = adj_matrix.mean()
@@ -62,7 +62,7 @@ class RecSysModel(torch.nn.Module):
         self.init_weight()
 
     def init_weight(self):
-        torch.nn.init.kaiming_uniform_(self.fc_basket_encoder_1.weight.data, nonlinearity='relu')
+        # torch.nn.init.kaiming_uniform_(self.fc_basket_encoder_1.weight.data, nonlinearity='relu')
         self.fc_basket_encoder_1.bias.data.zero_()
 
         # torch.nn.init.kaiming_uniform_(self.fc_basket_encoder_2.weight.data, nonlinearity='relu')
@@ -88,9 +88,9 @@ class RecSysModel(torch.nn.Module):
         batch_size = x.size()[0]
         item_bias_diag = F.relu(torch.diag(self.I_B))
         reshape_x = x.reshape(-1, self.nb_items)
-        encode_x_graph = torch.mm(reshape_x, item_bias_diag) + F.relu(torch.mm(reshape_x, self.A) - torch.abs(self.threshold))
+        encode_x_graph = torch.mm(reshape_x, item_bias_diag) + F.relu(torch.mm(reshape_x, self.C) - torch.abs(self.threshold))
         basket_x = encode_x_graph.reshape(-1, self.max_seq_length, self.nb_items)
-        basket_encoder_1 = self.drop_out_1(F.relu(self.fc_basket_encoder_1(basket_x)))
+        basket_encoder_1 = self.drop_out_1(self.fc_basket_encoder_1(basket_x))
         # print(basket_encoder_1)
         # basket_encoder_2 = F.relu(self.fc_basket_encoder_2(basket_x))
 
@@ -117,7 +117,7 @@ class RecSysModel(torch.nn.Module):
 
         # print(next_item_probs)
         predict = (1 - self.alpha) * next_item_probs + self.alpha * (
-                torch.mm(next_item_probs, item_bias_diag) + torch.mm(next_item_probs, self.A))
+                torch.mm(next_item_probs, item_bias_diag) + torch.mm(next_item_probs, self.C))
         # predict score
         # print("similar between predict score")
         # print(similar_in_batch(predict.detach()))

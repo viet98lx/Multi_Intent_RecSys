@@ -5,7 +5,7 @@ import os
 
 parser = argparse.ArgumentParser(description='Generate C matrix.')
 
-parser.add_argument('--nb_hop', help='The order of the real adjacency matrix (default:1)', default=1)
+parser.add_argument('--nb_hop', type=int, help='The order of the real adjacency matrix (default:1)', default=1)
 parser.add_argument('--data_dir', help='Data folder', required=True)
 args = parser.parse_args()
 
@@ -17,6 +17,7 @@ if(not os.path.exists(output_dir)):
     print("Directory '%s' created successfully" % output_dir)
   except OSError as error:
       print("OS folder error")
+
 nb_hop = args.nb_hop
 
 train_data_path = data_dir + 'train.txt'
@@ -54,7 +55,7 @@ rmatrix_fpath = output_dir + "/r_matrix_" + str(nb_hop) + "w.npz"
 mul = real_adj_matrix
 w_mul = real_adj_matrix
 coeff = 1.0
-for w in range(1, 1):
+for w in range(1, nb_hop):
     coeff *= 0.85
     w_mul *= real_adj_matrix
     w_mul = utils.remove_diag(w_mul)

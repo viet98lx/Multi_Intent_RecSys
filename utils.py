@@ -117,7 +117,7 @@ def create_sparse_matrix(pairs, NB_ITEMS):
     adj_matrix = sp.csc_matrix((data, (row, col)), shape=(NB_ITEMS, NB_ITEMS), dtype="float32")
     nb_nonzero = len(pairs)
     density = nb_nonzero * 1.0 / NB_ITEMS / NB_ITEMS
-    print("Density: {:.6f}".format(density))
+    print("Density of first order matrix: {:.6f}".format(density))
 
     return sp.csc_matrix(adj_matrix, dtype="float32")
 
