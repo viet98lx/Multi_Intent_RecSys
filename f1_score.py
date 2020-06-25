@@ -46,9 +46,14 @@ for i, ground_truth in enumerate(list_seq):
   list_recall.append(recall_score)
   precision_score = float(correct) / float(top_k)
   list_precision.append(precision_score)
-  f1_score = 2*recall_score*precision_score/(recall_score + precision_score)
+  if (correct == 0):
+      f1_score = float(0)
+  else:
+      f1_score = 2*recall_score*precision_score/(recall_score + precision_score)
   list_f1.append(f1_score)
 # print(list_recall)
+# print(list_precision)
+# print(list_f1)
 print("Recall@%d : %.6f" % (top_k, np.array(list_recall).mean()))
 print("Precision@%d : %.6f" % (top_k, np.array(list_precision).mean()))
 print("F1-score@%d : %.6f" % (top_k, np.array(list_f1).mean()))
